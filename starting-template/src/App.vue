@@ -4,9 +4,9 @@
         <app-header/>
 
         
-            <app-modal :character = "characters [characterIndex]"/>
+            <app-modal :character = "Characters [characterIndex]"/>
 
-            <spinner/>
+            <spinner v-if="loading"/>
 
             <div class="row">
             
@@ -14,7 +14,7 @@
 
 
 
-        <div v-for="(el, idx) in characters" :key="el.id" class="card mb-3" style="max-width: 540px;">
+        <div v-for="(el, idx) in Characters" :key="el.id" class="card mb-3" style="max-width: 540px;">
             <div class="row g-0">
               <div class="col-md-4">
                 <img :src="el.thumbnail" class="img-fluid rounded-start" :alt="el.name">
@@ -59,14 +59,28 @@
         },
         methods: { 
             fetchCharacters: function (){
-                fetch ('https://netology-api-marvel.herokuapp.com/characters')
+               return fetch ('https://netology-api-marvel.herokuapp.com/characters')
                       .then(res => res.json())
                       .then(json => this.characters = json)
+            },
+            changeSearch: function (value) {
+              this.search = value 
             }
         },
-        computed: {},
-        mounted () {
-            this.fetchCharacters();
+        computed: {
+          searchCharacters: function (){
+           const {characters, search} = this
+           return characters.filter (character => {
+             return character.name.indexOf(search) !== -1;}
+           )
+          }
+        },
+       async mounted () {
+
+          this.loading = true;
+             await this.fetchCharacters();
+            this.loading = false;
+            
         }
     }
 </script>
